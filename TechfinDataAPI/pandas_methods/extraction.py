@@ -63,7 +63,7 @@ def col_generate(index: Union[List, int],
 def col_remove(data: pd.DataFrame,
                cols: List[str]):
     '''
-    #去除某些col
+    去除某些col
 
     Args:
         data: dataframe
