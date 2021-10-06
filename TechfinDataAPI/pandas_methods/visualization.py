@@ -84,3 +84,23 @@ def cov_heatmap(data: pd.DataFrame,
     ax = sns.heatmap(temp)
 
 
+def corr_heatmap(data: pd.DataFrame,
+              self_: bool = False) -> None:
+    '''
+    因子间的covariance plot
+
+    Args:
+        data: df
+        variance: 是否展示自身（可能会导致颜色不明显）
+
+    Returns:
+        None
+    '''
+    sns.set()
+    plt.figure(figsize = (25,25))
+    temp = data.corr().to_numpy()
+    if self_ != True:
+        temp[np.arange(len(temp)), np.arange(len(temp))] = 0
+    ax = sns.heatmap(temp)
+
+

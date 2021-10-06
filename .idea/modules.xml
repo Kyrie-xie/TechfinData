@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/../TechfinDataAPI/.idea/TechfinDataAPI.iml" filepath="$PROJECT_DIR$/../TechfinDataAPI/.idea/TechfinDataAPI.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../TechfinDataAPI/.idea/TechfinData.iml" filepath="$PROJECT_DIR$/../TechfinDataAPI/.idea/TechfinData.iml" />
     </modules>
   </component>
 </project>

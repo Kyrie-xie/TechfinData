@@ -61,7 +61,7 @@ def col_generate(index: Union[List, int],
 
 
 def col_remove(data: pd.DataFrame,
-               cols: List[int]):
+               cols: List[str]):
     '''
     #去除某些col
 

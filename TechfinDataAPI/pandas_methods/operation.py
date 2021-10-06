@@ -58,7 +58,7 @@ def date_first(data):
     return KeywordFirst('date')(data)
 
 def level_swap(data: pd.DataFrame,
-               index: Union[Tuple[int, int], List[int, int]]) -> None:
+               index: Union[list[int], tuple[int]]) -> None:
     '''
     交换a,b两个index的level (Inplace)
 
