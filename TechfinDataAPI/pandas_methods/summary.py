@@ -9,7 +9,8 @@ import numpy as np
 from typing import List, Union
 
 
-def na_locate(data: pd.DataFrame) -> np.array:
+def na_locate(data: pd.DataFrame,
+              **kwargs) -> np.array:
     '''
     返回缺失值在数据中的位置 （row，col）
 
@@ -19,12 +20,13 @@ def na_locate(data: pd.DataFrame) -> np.array:
     Returns:
         缺失值的位置 in numpy.array
     '''
-    x = np.array(data.isna())
+    x = np.array(kwargs.get('data_na') or data.isna())
     return np.argwhere(x)
 
 
 def na_col(data: pd.DataFrame,
-           show_all: bool = True) -> pd.Series:
+           show_all: bool = True,
+           **kwargs) -> pd.Series:
     '''
     返回（所给的）col中存在多少缺失值
 
@@ -37,16 +39,24 @@ def na_col(data: pd.DataFrame,
     '''
     if show_all:
         pd.set_option('display.max_columns', None)
-    return data.isna().sum(0).to_frame().T
+    if 'data_na' in kwargs:
+        return kwargs.get('data_na').sum(0).to_frame().T
+    else:
+        return data.isna().sum(0).to_frame().T
 
 
-def na_total(data):
-    return data.isna().sum().sum()
+def na_total(data,
+             **kwargs):
+    if 'data_na' in kwargs:
+        return kwargs.get('data_na').sum().sum()
+    else:
+        return data.isna().sum().sum()
 
 
 def stock_count_by_date(data: pd.DataFrame,
                         by_list: bool = True,
-                        index_name: str = 'trade_date') -> Union[pd.Series, List[int]]:
+                        index_name: str = 'trade_date',
+                        **kwargs) -> Union[pd.Series, List[int]]:
     '''
     返回时间versus股票数目，查看股票数量在时序上的变化
 
@@ -59,15 +69,18 @@ def stock_count_by_date(data: pd.DataFrame,
     Returns:
         在时间上的股票数的pd.series or list
     '''
-    if index_name not in data.index.names[0]:
-        raise Exception('当前只支持标的在主index上的dataframe')
-    res = data.apply(lambda x: 1, axis=1).groupby(data.index.get_level_values(0)).sum()
-    return res if not by_list else list(res)
+    try:
+        _p = (kwargs.get('index_names') or data.index.names).index(index_name)
+        res = data.apply(lambda x: 1, axis=1).groupby(data.index.get_level_values(_p)).sum()
+        return res if not by_list else list(res)
+    except:
+        raise KeyError('没有该index')
 
 
 def na_info(data: pd.DataFrame,
             by_array: bool = True,
-            index_name: str = 'trade_date') -> Union[np.array, pd.DataFrame]:
+            index_name: str = 'trade_date',
+            **kwargs) -> Union[np.array, pd.DataFrame]:
     '''
     返回在y天时，因子x上的缺失值数量的array或者dataframe
 
@@ -80,9 +93,12 @@ def na_info(data: pd.DataFrame,
     Returns:
         array or pd.df
     '''
-    if index_name not in data.index.names[0]:
-        raise Exception('当前只支持标的在主index上的dataframe')
-    data_na = data.isna()
-    data_na = data_na.groupby(data_na.index.get_level_values(0)).sum()
-    return np.array(data_na) if by_array else data_na
+    try:
+        _p = (kwargs.get('index_names') or data.index.names).index(index_name)
+        data_na = kwargs.get('data_na') or data.isna()
+        data_na = data_na.groupby(data_na.index.get_level_values(_p)).sum()
+        return np.array(data_na) if by_array else data_na
+    except:
+        raise KeyError('没有该index')
+
 

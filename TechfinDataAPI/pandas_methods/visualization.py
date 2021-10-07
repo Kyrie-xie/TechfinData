@@ -14,7 +14,8 @@ from TechfinDataAPI.pandas_methods.summary import (na_info, stock_count_by_date,
 
 def na_factor_plot(data: pd.DataFrame,
                    num: int = 5,
-                   fig_size_=(15, 15)) -> None:
+                   fig_size_=(15, 15),
+                   **kwargs) -> None:
     '''
     plot缺失值最多的k个因子在时序下的缺失值变化
 
@@ -26,9 +27,9 @@ def na_factor_plot(data: pd.DataFrame,
     Returns:
         None
     '''
-    na_array = na_info(data, True)
+    na_array = na_info(data, True, **kwargs)
     num = min(data.shape[1], num)
-    stock_number = stock_count_by_date(data, by_list=False)
+    stock_number = stock_count_by_date(data, by_list=False, **kwargs)
     plt.figure(figsize=fig_size_)
     plt.plot(np.arange(na_array.shape[0]), stock_number)
     for i, factor in enumerate(na_array[:, na_array.sum(0).argsort()[-num:]].T):
@@ -39,8 +40,8 @@ def na_factor_plot(data: pd.DataFrame,
 
 
 def na_factor_time_plot(data: pd.DataFrame,
-                        is_na: bool = False,
-                        fig_size: Union[Tuple[int],List[int]] = (50, 50)) -> None:
+                        fig_size: Union[Tuple[int],List[int]] = (50, 50),
+                        **kwargs) -> None:
     '''
     在y天，因子x的缺失值plot
 
@@ -52,11 +53,8 @@ def na_factor_time_plot(data: pd.DataFrame,
     Returns:
         None
     '''
-    fig = plt.figure(figsize=fig_size)
-    if is_na:
-        na_array1 = data
-    else:
-        na_array1 = na_info(data, by_array=True)
+    plt.figure(figsize=fig_size)
+    na_array1 = na_info(data, by_array=True, **kwargs)
     plt.imshow(na_array1)
     plt.colorbar(orientation='vertical')
     plt.xlabel('factor')
@@ -65,7 +63,8 @@ def na_factor_time_plot(data: pd.DataFrame,
 
 
 def cov_heatmap(data: pd.DataFrame,
-              variance: bool = False) -> None:
+                _self: bool = False,
+                **kwargs) -> None:
     '''
     因子间的covariance plot
 
@@ -79,13 +78,14 @@ def cov_heatmap(data: pd.DataFrame,
     sns.set()
     plt.figure(figsize = (25,25))
     temp = data.cov().to_numpy()
-    if variance != True:
+    if _self != True:
         temp[np.arange(len(temp)), np.arange(len(temp))] = 0
-    ax = sns.heatmap(temp)
+    sns.heatmap(temp)
 
 
 def corr_heatmap(data: pd.DataFrame,
-              self_: bool = False) -> None:
+              self_: bool = False,
+                 **kwargs) -> None:
     '''
     因子间的covariance plot
 

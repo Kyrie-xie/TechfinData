@@ -12,7 +12,8 @@ class KeywordFirst:
     '''
 
     def __init__(self,
-                 keyword: str = None):
+                 keyword: str = None,
+                 **kwargs):
         '''
 
         Args:
@@ -22,7 +23,8 @@ class KeywordFirst:
 
     def __call__(self,
                  data: pd.DataFrame,
-                 inplace: bool = False
+                 inplace: bool = False,
+                 **kwargs
                  ) -> Optional[pd.DataFrame]:
         '''
         输入data返回新的置顶后的dataset
@@ -76,7 +78,7 @@ def level_swap(data: pd.DataFrame,
         raise Exception('index和dataframe不匹配')
 
 
-def date_mean_fill(data) -> None:
+def date_mean_fill(data, **kwargs) -> None:
     '''
     使用date mean来填充缺失值
 
@@ -86,7 +88,7 @@ def date_mean_fill(data) -> None:
     Returns:
         None
     '''
-    data.fillna(value=group_by_index_name(data, 'trade_date').mean(), inplace=True)
+    data.fillna(value=group_by_index_name(data, 'trade_date', **kwargs).mean(), inplace=True)
 
 
 def hist_fill(data: pd.DataFrame,

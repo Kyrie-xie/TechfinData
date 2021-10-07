@@ -4,8 +4,6 @@
     根据当前任务做的module
         比较符合 （date，stock）*factor数据
 '''
-import pandas as pd
-
 from TechfinDataAPI.pandas_methods import *
 from copy import deepcopy
 from typing import Union, Callable
@@ -13,9 +11,10 @@ from typing import Union, Callable
 
 # 一个对(时间，股票)*因子的pandas.dataFrame进行数据预处理的系统
 class PdSys:
+    _property: dict = {}
     def __init__(self,
                  data: Union[pd.DataFrame, str],
-                 reader: Callable[[str], pd.DataFrame] = None,
+                 reader: Optional[Callable[[str], pd.DataFrame]] = None,
                  func_intro: bool = True) -> None:
         """
         :param data: 需要被处理的数据或者途径
@@ -44,6 +43,13 @@ class PdSys:
             print('################################################ \n ')
             print('备份完成： 使用 .recover()还原')
         print('使用help（）来查看可用的命令')
+
+    def start(self):
+        self._property['index_names'] = self.df_.index.names
+        self._property['data_na'] = self.df_.isna()
+        temp = np.array(self.df_.index)
+        for index_level, index_name in enumerate(self._property['index_names']):
+            self._property[index_name] = np.unique(temp[:, index_level])
 
     def show_col(self,
                  num: int = None):
@@ -262,7 +268,7 @@ class PdSys:
         else:
             return random_sample(self.df_,
                                  frac=frac,
-                                 index_name=keyword
+                                 index_name=index_name
                                  )
 
     def __call__(self):

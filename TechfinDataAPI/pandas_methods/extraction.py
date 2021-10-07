@@ -12,7 +12,8 @@ from typing import List, Union
 # 子数据提取 #
 ############
 def data_split(data: pd.DataFrame,
-               fracs: Union[np.array, List[float]]) -> List[pd.DataFrame]:
+               fracs: Union[np.array, List[float]],
+               **kwargs) -> List[pd.DataFrame]:
     '''
     Description:
         将dataframe根据某种格式分解成多个子dataframe
@@ -40,7 +41,8 @@ def data_split(data: pd.DataFrame,
 
 
 def col_generate(index: Union[List, int],
-                 keyword: str) -> List[str]:
+                 keyword: str,
+                 **kwargs) -> List[str]:
     '''
     生成对应的col names，用于批量生成'factor_i'
 
@@ -61,7 +63,8 @@ def col_generate(index: Union[List, int],
 
 
 def col_remove(data: pd.DataFrame,
-               cols: List[str]):
+               cols: List[str],
+               **kwargs):
     '''
     去除某些col
 
@@ -75,7 +78,8 @@ def col_remove(data: pd.DataFrame,
 
 
 def group_by_index_name(data: pd.DataFrame,
-                        index_name: str):
+                        index_name: str,
+                        **kwargs):
     '''
     在指定的index上进行的group wrapping
 
@@ -89,13 +93,14 @@ def group_by_index_name(data: pd.DataFrame,
 
     if index_name not in data.index.names:
         raise Exception('没有这个index')
-    position = list(data.index.names).index(index_name)
+    position = (kwargs.get('index_names') or data.index.names).index(index_name)
     temp = data.groupby(data.index.get_level_values(position))
     return temp
 
 
 def index_norm(data: pd.DataFrame,
-               index_name: str = 'trade_date') -> pd.DataFrame:
+               index_name: str = 'trade_date',
+               **kwargs) -> pd.DataFrame:
     '''
     在每日截面数据的基础上进行标准化操作，不支持inplace操作，所以需要重新对数据赋值
 
@@ -112,7 +117,8 @@ def index_norm(data: pd.DataFrame,
 
 def keyword_extract(data: pd.DataFrame,
                     keyword: str,
-                    index: Union[int, str] = 0) -> pd.DataFrame:
+                    index: Union[int, str] = 0,
+                    **kwargs) -> pd.DataFrame:
     '''
     在某个index上，提取出含有keyword（可以是list）的dataframe rows
 
@@ -127,7 +133,7 @@ def keyword_extract(data: pd.DataFrame,
 
     if type(index) != int:
         # 名字输入
-        index = data.index.names.index(index)
+        index = (kwargs.get('index_names') or data.index.names).index(index)
 
     def func(_input,
              _index,
@@ -142,7 +148,8 @@ def keyword_extract(data: pd.DataFrame,
 
 def after_date(data: pd.DataFrame,
                date: str,
-               index_name: str = 'trade_date') -> pd.DataFrame:
+               index_name: str = 'trade_date',
+               **kwargs) -> pd.DataFrame:
     '''
     # 在时序上提取出在after_date上的数据
 
@@ -154,14 +161,15 @@ def after_date(data: pd.DataFrame,
     Returns:
         新的数据集
     '''
-    position = data.index.names.index(index_name)
-    a = np.unique(data.index.get_level_values(position))
+    position = (kwargs.get('index_names') or data.index.names).index(index_name)
+    a = kwargs.get(index_name) or np.unique(data.index.get_level_values(position))
     return data.loc[a[a > date]]
 
 
 def random_sample(data: pd.DataFrame,
                   frac: float,
                   index_name: str = 'stock_code',
+                  **kwargs
                   ) -> pd.DataFrame:
     '''
     在给的index上的提取frac比例sample
@@ -176,8 +184,8 @@ def random_sample(data: pd.DataFrame,
     '''
     if frac >= 1:
         raise Exception('请重新检查输入的比例')
-    position = data.index.names.index(index_name)
-    stock_name_ = np.unique(data.index.get_level_values(position))
+    position = (kwargs.get('index_names') or data.index.names).index(index_name)
+    stock_name_ = kwargs.get(index_name) or np.unique(data.index.get_level_values(position))
     random_stock_ = np.random.choice(stock_name_, int(frac * len(stock_name_)), replace=False)
     return keyword_extract(data, random_stock_, position, )
 
